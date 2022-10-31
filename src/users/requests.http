@@ -1,0 +1,18 @@
+### List users
+GET http://localhost:5000/users
+
+### Create user
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+    "email": "test1@gmail.com",
+    "passsword": "123",
+    "name": "Minh Nguyen"
+}
+
+### Get private file
+GET http://localhost:5000/users/files/1
+
+### Get all files for specify user
+GET  http://localhost:5000/users/files

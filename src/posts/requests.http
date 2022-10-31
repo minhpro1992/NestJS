@@ -1,0 +1,23 @@
+### List of posts
+GET http://localhost:3000/posts
+
+### Create new post
+POST http://localhost:3000/posts
+Content-Type: application/json
+
+{
+    "title": "test",
+    "content": 123
+}
+
+### Update post
+PATCH http://localhost:3000/posts
+Content-Type: application/json
+
+{
+    "tille": 123
+}
+
+### Remove post
+
+DELETE http://localhost:3000/posts/1
