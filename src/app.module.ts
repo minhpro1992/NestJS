@@ -8,6 +8,7 @@ import { FilesModule } from './files/files.module';
 import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { LocalFilesModule } from './local-files/local-files.module';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { LocalFilesModule } from './local-files/local-files.module';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_DB: Joi.string().required(),
         PORT: Joi.number(),
+        UPLOAD_FILES_DESTINATION: Joi.string().required(),
         // AWS_PUBLIC_BUCKET_KEY: Joi.string().required,
         // AWS_REGION: Joi.string().required,
         // AWS_ACCESS_KEY: Joi.string().required,
@@ -30,6 +32,7 @@ import { LocalFilesModule } from './local-files/local-files.module';
     UsersModule,
     FilesModule,
     LocalFilesModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

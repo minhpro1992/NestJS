@@ -1,11 +1,13 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FilesService } from 'src/files/files.service';
+import { LocalFilesService } from 'src/local-files/local-files.service';
 import { Repository } from 'typeorm';
+import { FilesService } from '../files/files.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import User from './entities/user.entity';
@@ -15,11 +17,16 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepo: Repository<User>,
     private filesService: FilesService,
+    private localFilesService: LocalFilesService,
   ) {}
   async create(createUserDto: CreateUserDto) {
-    const user = await this.usersRepo.create(createUserDto);
-    await this.usersRepo.save(user);
-    return user;
+    try {
+      const user = await this.usersRepo.create(createUserDto);
+      await this.usersRepo.save(user);
+      return user;
+    } catch (error) {
+      throw new BadRequestException('Something wrong to create new user');
+    }
   }
 
   async addAvatar(userId: number, imageBuffer: Buffer, fileName: string) {
@@ -91,6 +98,38 @@ export class UsersService {
         }),
       );
     }
+  }
+
+  async addLocalFile(userId: number, fileData: LocalFileDto) {
+    const file = await this.localFilesService.createLocalFile(fileData);
+    await this.usersRepo.update(userId, {
+      localFileId: +file.id,
+    });
+    return file;
+  }
+
+  async getById(userId: number) {
+    const user = await this.usersRepo.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  async getByEmail(email: string) {
+    const user = await this.usersRepo.findOne({
+      where: {
+        email,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async findAll() {
