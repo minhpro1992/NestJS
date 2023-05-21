@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { AuthenticationService } from './authentication.service';
 import JwtAuthenticationGuard from './jwt-authentication.guard';
+import { JwtStrategy } from './jwt.strategy';
 import { LocalStrategy } from './local.strategy';
 import { LocalAuthenticationGuard } from './localAuthentication.guard';
 import RequestWithUser from './requestWithUser.interface';
@@ -21,10 +22,11 @@ export class AuthenticationController {
     response.setHeader('Set-Cookie', cookie);
     user.password = undefined;
     console.log('22: ', cookie);
-    return { cookie };
+    return cookie;
+    // return { cookie };
     // return response.send(user);
   }
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtStrategy)
   @Post('profile')
   async login(@Request() req) {
     console.log(req.user);

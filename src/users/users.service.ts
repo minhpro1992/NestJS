@@ -31,19 +31,25 @@ export class UsersService {
 
   async addAvatar(userId: number, imageBuffer: Buffer, fileName: string) {
     console.log(userId, imageBuffer, fileName);
-    const user = await this.usersRepo.findOne({
-      where: { id: userId },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
+    try {
+      const user = await this.usersRepo.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const avatar = await this.filesService.uploadPublicFile(
+        imageBuffer,
+        fileName,
+      );
+      Object.assign(user, avatar);
+      await this.usersRepo.save(user);
+      return user;
+    } catch (error) {
+      throw new Error(
+        'Something went wrong to add user avatar.Please try again.',
+      );
     }
-    const avatar = await this.filesService.uploadPublicFile(
-      imageBuffer,
-      fileName,
-    );
-    Object.assign(user, avatar);
-    await this.usersRepo.save(user);
-    return user;
   }
 
   async addPrivateAvatar(
@@ -52,20 +58,24 @@ export class UsersService {
     fileName: string,
   ) {
     console.log(userId, imageBuffer, fileName);
-    const user = await this.usersRepo.findOne({
-      where: { id: userId },
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
+    try {
+      const user = await this.usersRepo.findOne({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const avatar = await this.filesService.uploadPrivateFile(
+        userId,
+        imageBuffer,
+        fileName,
+      );
+      Object.assign(user, avatar);
+      await this.usersRepo.save(user);
+      return user;
+    } catch (error) {
+      throw new Error('Something went wrong to add private avatar');
     }
-    const avatar = await this.filesService.uploadPrivateFile(
-      userId,
-      imageBuffer,
-      fileName,
-    );
-    Object.assign(user, avatar);
-    await this.usersRepo.save(user);
-    return user;
   }
 
   async getPrivateFile(userId: number, fileId: number) {
@@ -77,26 +87,30 @@ export class UsersService {
   }
 
   async getAllPrivateFiles(userId: number) {
-    const user = await this.usersRepo.findOne({
-      where: {
-        id: userId,
-      },
-      relations: ['files'],
-    });
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    console.log(user);
-    if (Array.isArray(user.files) && user.files.length > 0) {
-      return Promise.all(
-        user.files.map(async (file) => {
-          const url = await this.filesService.generatePresignUrl(file.key);
-          return {
-            ...file,
-            url,
-          };
-        }),
-      );
+    try {
+      const user = await this.usersRepo.findOne({
+        where: {
+          id: userId,
+        },
+        relations: ['files'],
+      });
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      console.log(user);
+      if (Array.isArray(user.files) && user.files.length > 0) {
+        return Promise.all(
+          user.files.map(async (file) => {
+            const url = await this.filesService.generatePresignUrl(file.key);
+            return {
+              ...file,
+              url,
+            };
+          }),
+        );
+      }
+    } catch (error) {
+      throw new Error('Something went wrong to get all private files');
     }
   }
 

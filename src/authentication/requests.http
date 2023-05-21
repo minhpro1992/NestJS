@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### Auth
-POST http://localhost:5000/authentication/auth
+POST http://localhost:5000/authentication/profile
 Content-Type: application/json
 
 {

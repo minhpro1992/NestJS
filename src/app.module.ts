@@ -9,6 +9,7 @@ import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { LocalFilesModule } from './local-files/local-files.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { CsvModule } from './csv/csv.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
     FilesModule,
     LocalFilesModule,
     AuthenticationModule,
+    CsvModule,
   ],
   controllers: [AppController],
   providers: [AppService],
