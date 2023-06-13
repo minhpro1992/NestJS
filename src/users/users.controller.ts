@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,15 +9,21 @@ import {
   Post,
   Req,
   Res,
+  UploadedFile,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Response } from 'express';
-import { request } from 'http';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { Response, Express, request } from 'express';
+import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
+import { LocalAuthenticationGuard } from 'src/authentication/localAuthentication.guard';
 import RequestWithUser from 'src/authentication/requestWithUser.interface';
 import FindOneParams from 'src/files/dto/FindOneParams';
+import LocalFilesInterceptor from 'src/local-files/local-files.interceptor';
 import { CreateUserDto } from './dto/create-user.dto';
+import FileUploadDto from './dto/file-upload.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
@@ -31,7 +38,10 @@ export class UsersController {
 
   @Post('avatar')
   @UseInterceptors(FileInterceptor('file'))
-  addAvatar(@Req() request: RequestWithUser, @UploadedFiles() file: any) {
+  addAvatar(
+    @Req() request: RequestWithUser,
+    @UploadedFiles() file: Express.Multer.File,
+  ) {
     console.log(request.file);
     return this.usersService.addAvatar(
       request.user?.id || +3,
@@ -44,7 +54,7 @@ export class UsersController {
   @UseInterceptors(FileInterceptor('file'))
   addPrivateAvatar(
     @Req() request: RequestWithUser,
-    @UploadedFiles() file: any,
+    @UploadedFiles() file: Express.Multer.File,
   ) {
     console.log(request.file);
     return this.usersService.addPrivateAvatar(
@@ -75,6 +85,41 @@ export class UsersController {
     );
     return files;
   }
+
+  @Post('local-files')
+  @UseGuards(LocalAuthenticationGuard)
+  @UseInterceptors(
+    LocalFilesInterceptor({
+      fieldName: 'file',
+      path: '/local-files',
+      fileFilter: (request, file, callback) => {
+        if (!file.mimetype.includes('image')) {
+          return callback(new BadRequestException('Invalid file type'), false);
+        }
+        callback(null, true);
+      },
+      limits: {
+        fileSize: Math.pow(1024, 2),
+      },
+    }),
+  )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'A new avatar for the user',
+    type: FileUploadDto,
+  })
+  async addLocalFile(
+    @Req() request: RequestWithUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    console.log(request.user, file);
+    return this.usersService.addLocalFile(request.user.id, {
+      path: file.path,
+      minetype: file.mimetype,
+      filename: file.filename,
+    });
+  }
+
   @Get()
   findAll() {
     return this.usersService.findAll();

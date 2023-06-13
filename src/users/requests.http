@@ -6,9 +6,9 @@ POST http://localhost:5000/users
 Content-Type: application/json
 
 {
-    "email": "test1@gmail.com",
-    "passsword": "123",
-    "name": "Minh Nguyen"
+    "email": "test22@gmail.com",
+    "name": "Minh Nguyen",
+    "passsword": "test11"
 }
 
 ### Get private file

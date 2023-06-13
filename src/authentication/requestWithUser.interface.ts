@@ -1,8 +1,8 @@
-import { Request } from 'express';
+import { Request, Express } from 'express';
 import User from '../users/entities/user.entity';
 
 interface RequestWithUser extends Request {
   user: User;
-  file: Record<string, string | number | Buffer>;
+  file: Express.Multer.File;
 }
 export default RequestWithUser;

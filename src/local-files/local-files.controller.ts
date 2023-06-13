@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { LocalFilesService } from './local-files.service';
 import { CreateLocalFileDto } from './dto/create-local-file.dto';
 import { UpdateLocalFileDto } from './dto/update-local-file.dto';
@@ -23,7 +31,10 @@ export class LocalFilesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLocalFileDto: UpdateLocalFileDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateLocalFileDto: UpdateLocalFileDto,
+  ) {
     return this.localFilesService.update(+id, updateLocalFileDto);
   }
 

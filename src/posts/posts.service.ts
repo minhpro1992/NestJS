@@ -37,8 +37,9 @@ export class PostsService {
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    Object.assign(post, updatePostDto);
-    return await this.postsRepo.save(post);
+    const updatedPost = Object.assign(post, updatePostDto);
+    await this.postsRepo.save(post);
+    return updatedPost;
   }
 
   async remove(id: number) {
