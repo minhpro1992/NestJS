@@ -1,6 +1,8 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-
-export class migration1670235754942 implements MigrationInterface {
+/**
+ * yarn migration:create -- src/migrations/NewMigration
+ **/
+export class NewMigration1685204171131 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     queryRunner.query(`
         create table todos (

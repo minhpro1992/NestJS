@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { NewMigration1685204171131 } from 'src/migrations/1685204171131-NewMigration';
 
 @Module({
   imports: [
@@ -18,6 +19,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
           database: configService.get('POSTGRES_DB'),
           entities: [__dirname + '/../**/*.entity.js'],
           synchronize: true,
+          migrations: [NewMigration1685204171131],
+          cli: {
+            migrationDir: 'src/migrations',
+          },
+          logging: true,
         };
       },
     }),
